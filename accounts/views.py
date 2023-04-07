@@ -1,8 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth import authenticate, login, logout
+from accounts.models import Profile
 
 # Create your views here.
 
@@ -56,3 +57,14 @@ def register_page(request):
         return HttpResponseRedirect(request.path_info) 
             
     return render(request, 'accounts/register.html')
+
+
+
+def activate(request, email_token):
+    try:
+        user = Profile.objects.get(email_token=email_token)
+        user.is_email_verified=True
+        user.save()
+        return redirect('/')
+    except Exception as e:
+        return HttpResponse(' token is Invalid or expired')
